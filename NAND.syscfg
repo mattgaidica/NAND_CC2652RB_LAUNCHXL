@@ -1,0 +1,157 @@
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --board "/ti/boards/CC2652RB_LAUNCHXL" --product "simplelink_cc13x2_26x2_sdk@4.30.00.54"
+ * @versions {"data":"2020090214","timestamp":"2020090214","tool":"1.6.0+1543","templates":"2020090214"}
+ */
+
+/**
+ * Import the modules used in this configuration.
+ */
+const CCFG   = scripting.addModule("/ti/devices/CCFG");
+const ADC    = scripting.addModule("/ti/drivers/ADC", {}, false);
+const ADC1   = ADC.addInstance();
+const ADC2   = ADC.addInstance();
+const GPIO   = scripting.addModule("/ti/drivers/GPIO");
+const GPIO1  = GPIO.addInstance();
+const GPIO2  = GPIO.addInstance();
+const GPIO3  = GPIO.addInstance();
+const GPIO4  = GPIO.addInstance();
+const GPIO5  = GPIO.addInstance();
+const GPIO6  = GPIO.addInstance();
+const GPIO7  = GPIO.addInstance();
+const GPIO8  = GPIO.addInstance();
+const GPIO9  = GPIO.addInstance();
+const GPIO10 = GPIO.addInstance();
+const GPIO11 = GPIO.addInstance();
+const I2C    = scripting.addModule("/ti/drivers/I2C", {}, false);
+const I2C1   = I2C.addInstance();
+const NVS    = scripting.addModule("/ti/drivers/NVS", {}, false);
+const NVS1   = NVS.addInstance();
+const RTOS   = scripting.addModule("/ti/drivers/RTOS");
+const SPI    = scripting.addModule("/ti/drivers/SPI", {}, false);
+const SPI1   = SPI.addInstance();
+const SPI2   = SPI.addInstance();
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+CCFG.enableDCDC         = false;
+CCFG.ccfgTemplate.$name = "ti_devices_CCFGTemplate0";
+
+ADC1.$name                = "THERM";
+ADC1.adc.adcPin.$assign   = "boosterpack.6";
+ADC1.adcPinInstance.$name = "CONFIG_PIN_20";
+
+ADC2.$name                = "R_VBATT";
+ADC2.adc.adcPin.$assign   = "boosterpack.23";
+ADC2.adcPinInstance.$name = "CONFIG_PIN_4";
+
+GPIO1.$name             = "LED_0";
+GPIO1.$hardware         = system.deviceData.board.components.LED_GREEN;
+GPIO1.outputStrength    = "Low";
+GPIO1.pinInstance.$name = "CONFIG_PIN_0";
+
+GPIO2.$name             = "_SHDN";
+GPIO2.mode              = "Output";
+GPIO2.pull              = "Pull Down";
+GPIO2.outputStrength    = "Low";
+GPIO2.gpioPin.$assign   = "boosterpack.32";
+GPIO2.pinInstance.$name = "CONFIG_PIN_8";
+
+GPIO3.$name              = "_FRAM_CS";
+GPIO3.mode               = "Output";
+GPIO3.initialOutputState = "High";
+GPIO3.outputStrength     = "Low";
+GPIO3.gpioPin.$assign    = "boosterpack.18";
+GPIO3.pinInstance.$name  = "CONFIG_PIN_9";
+
+GPIO4.$name              = "_NAND_CS";
+GPIO4.$hardware          = system.deviceData.board.components.MX25R8035F.subComponents.SELECT;
+GPIO4.initialOutputState = "High";
+GPIO4.outputStrength     = "Low";
+GPIO4.pinInstance.$name  = "CONFIG_PIN_10";
+
+GPIO5.$name              = "_EEG_CS";
+GPIO5.mode               = "Output";
+GPIO5.initialOutputState = "High";
+GPIO5.outputStrength     = "Low";
+GPIO5.gpioPin.$assign    = "boosterpack.8";
+GPIO5.pinInstance.$name  = "CONFIG_PIN_11";
+
+GPIO6.$name              = "EEG_START";
+GPIO6.mode               = "Output";
+GPIO6.outputStrength     = "Low";
+GPIO6.initialOutputState = "High";
+GPIO6.gpioPin.$assign    = "boosterpack.5";
+GPIO6.pinInstance.$name  = "CONFIG_PIN_12";
+
+GPIO7.$name             = "_EEG_DRDY";
+GPIO7.pull              = "Pull Up";
+GPIO7.gpioPin.$assign   = "boosterpack.2";
+GPIO7.pinInstance.$name = "CONFIG_PIN_13";
+
+GPIO8.$name             = "_AXY_MAG";
+GPIO8.gpioPin.$assign   = "boosterpack.10";
+GPIO8.pinInstance.$name = "CONFIG_PIN_15";
+
+GPIO9.$name             = "AXY_INT1";
+GPIO9.gpioPin.$assign   = "boosterpack.19";
+GPIO9.pinInstance.$name = "CONFIG_PIN_16";
+
+GPIO10.$name             = "AXY_INT2";
+GPIO10.$hardware         = system.deviceData.board.components["BTN-1"];
+GPIO10.pull              = "None";
+GPIO10.interruptTrigger  = "None";
+GPIO10.pinInstance.$name = "CONFIG_PIN_17";
+GPIO10.gpioPin.$assign   = "boosterpack.13";
+
+GPIO11.$name             = "DEBUG";
+GPIO11.$hardware         = system.deviceData.board.components["BTN-2"];
+GPIO11.interruptTrigger  = "None";
+GPIO11.pinInstance.$name = "CONFIG_PIN_21";
+
+I2C1.$name                = "CONFIG_I2C_AXY";
+I2C1.i2c.sdaPin.$assign   = "boosterpack.30";
+I2C1.i2c.sclPin.$assign   = "boosterpack.29";
+I2C1.sdaPinInstance.$name = "CONFIG_PIN_18";
+I2C1.clkPinInstance.$name = "CONFIG_PIN_19";
+
+NVS1.$name                    = "ESLO_NVS_0";
+NVS1.internalFlash.$name      = "ti_drivers_nvs_NVSCC26XX0";
+NVS1.internalFlash.regionBase = 0x4C000;
+
+SPI1.$hardware             = system.deviceData.board.components.LP_SPI;
+SPI1.$name                 = "CONFIG_SPI";
+SPI1.sclkPinInstance.$name = "CONFIG_PIN_1";
+SPI1.misoPinInstance.$name = "CONFIG_PIN_2";
+SPI1.mosiPinInstance.$name = "CONFIG_PIN_3";
+
+SPI2.$name                 = "CONFIG_SPI_EEG";
+SPI2.spi.sclkPin.$assign   = "boosterpack.37";
+SPI2.spi.misoPin.$assign   = "boosterpack.31";
+SPI2.spi.mosiPin.$assign   = "boosterpack.36";
+SPI2.sclkPinInstance.$name = "CONFIG_PIN_5";
+SPI2.misoPinInstance.$name = "CONFIG_PIN_6";
+SPI2.mosiPinInstance.$name = "CONFIG_PIN_7";
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+ADC1.adc.$suggestSolution              = "ADC0";
+ADC2.adc.$suggestSolution              = "ADC0";
+GPIO1.gpioPin.$suggestSolution         = "boosterpack.40";
+GPIO4.gpioPin.$suggestSolution         = "boosterpack.38";
+GPIO11.gpioPin.$suggestSolution        = "boosterpack.12";
+I2C1.i2c.$suggestSolution              = "I2C0";
+SPI1.spi.$suggestSolution              = "SSI0";
+SPI1.spi.sclkPin.$suggestSolution      = "boosterpack.7";
+SPI1.spi.misoPin.$suggestSolution      = "boosterpack.14";
+SPI1.spi.mosiPin.$suggestSolution      = "boosterpack.15";
+SPI1.spi.dmaRxChannel.$suggestSolution = "DMA_CH3";
+SPI1.spi.dmaTxChannel.$suggestSolution = "DMA_CH4";
+SPI2.spi.$suggestSolution              = "SSI1";
+SPI2.spi.dmaRxChannel.$suggestSolution = "DMA_CH16";
+SPI2.spi.dmaTxChannel.$suggestSolution = "DMA_CH17";

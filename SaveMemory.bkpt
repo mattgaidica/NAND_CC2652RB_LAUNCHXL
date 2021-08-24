@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<breakpoints>
+<breakpoint enabled="true" persistant="true" registered="true">
+<resource path="/NAND_CC2652RB_LAUNCHXL/NAND.c" type="1"/>
+<marker lineNumber="50" type="com.ti.ccstudio.debug.CCSBreakpointMarker">
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.threadname" value="Texas Instruments XDS110 USB Debug Probe/Cortex_M4_0"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.filePath" value="/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/NAND.c"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.symbolName" value="$C$L3"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.addressBitSize" value="32"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
+<attrib name="message" value="NAND.c, line 50 ($C$L3)  [H/W BP]"/>
+<attrib name="org.eclipse.debug.core.id" value="com.ti.ccstudio.debug.debugModel"/>
+<attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/NAND.c"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.iconMask" value="135"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.addressPage" value="0"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.timeStamp" value="1610127307551"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.hardware" value="true"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.dsFilePath" value="/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/Debug/../NAND.c"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.address" value="0x00001CC2"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.lineNumber" value="50"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.type" value="2"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.serialData" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot; ?&gt;&#x0A;&lt;breakpoints xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;breakpoints.xsd&quot;&gt;&#x0A;&#x0A;  &lt;breakpoint type=&quot;AET&quot;&gt;&#x0A;    &lt;property&gt;&#x0A;      &lt;name&gt;Hardware Configuration&lt;/name&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Type&lt;/name&gt;&#x0A;        &lt;string&gt;Breakpoint&lt;/string&gt;&#x0A;        &lt;property&gt;&#x0A;          &lt;name&gt;Location&lt;/name&gt;&#x0A;          &lt;location&gt;&#x0A;            &lt;source&gt;&#x0A;              &lt;symbol_file&gt;/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/Debug/NAND_CC2652RB_LAUNCHXL.out&lt;/symbol_file&gt;&#x0A;              &lt;filename&gt;/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/Debug/../NAND.c&lt;/filename&gt;&#x0A;              &lt;line&gt;50&lt;/line&gt;&#x0A;            &lt;/source&gt;&#x0A;            &lt;page&gt;0&lt;/page&gt;&#x0A;          &lt;/location&gt;&#x0A;        &lt;/property&gt;&#x0A;      &lt;/property&gt;&#x0A;    &lt;/property&gt;&#x0A;    &lt;property&gt;&#x0A;      &lt;name&gt;Debugger Response&lt;/name&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Condition&lt;/name&gt;&#x0A;        &lt;string&gt;&lt;/string&gt;&#x0A;      &lt;/property&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Skip Count&lt;/name&gt;&#x0A;        &lt;integer&gt;0&lt;/integer&gt;&#x0A;        &lt;property&gt;&#x0A;          &lt;name&gt;Current Count&lt;/name&gt;&#x0A;          &lt;integer&gt;0&lt;/integer&gt;&#x0A;        &lt;/property&gt;&#x0A;      &lt;/property&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Action&lt;/name&gt;&#x0A;        &lt;string&gt;Execute Expression (GEL)&lt;/string&gt;&#x0A;        &lt;property&gt;&#x0A;          &lt;name&gt;Expression&lt;/name&gt;&#x0A;          &lt;string&gt;GEL_MemorySave(saveBug, 0, 512*64, &quot;/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/memory.dat&quot;, 2, 1, 32, 1);&lt;/string&gt;&#x0A;        &lt;/property&gt;&#x0A;      &lt;/property&gt;&#x0A;    &lt;/property&gt;&#x0A;    &lt;property&gt;&#x0A;      &lt;name&gt;Miscellaneous&lt;/name&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Group&lt;/name&gt;&#x0A;        &lt;string&gt;Default Group&lt;/string&gt;&#x0A;      &lt;/property&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Name&lt;/name&gt;&#x0A;        &lt;string&gt;Breakpoint&lt;/string&gt;&#x0A;      &lt;/property&gt;&#x0A;    &lt;/property&gt;&#x0A;    &lt;enabled&gt;1&lt;/enabled&gt;&#x0A;  &lt;/breakpoint&gt;&#x0A;&#x0A;&lt;/breakpoints&gt;&#x0A;"/>
+<attrib name="location" value="/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/NAND.c"/>
+<attrib name="org.eclipse.cdt.debug.ui.cDebug.capable_of_show_full_paths" value="true"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.hwType" value="1"/>
+<attrib name="workingset_name" value=""/>
+<attrib name="workingset_id" value="org.eclipse.debug.ui.breakpointWorkingSet"/>
+</marker>
+</breakpoint>
+<breakpoint enabled="true" persistant="true" registered="true">
+<resource path="/NAND_CC2652RB_LAUNCHXL/NAND.c" type="1"/>
+<marker lineNumber="63" type="com.ti.ccstudio.debug.CCSBreakpointMarker">
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.threadname" value="Texas Instruments XDS110 USB Debug Probe/Cortex_M4_0"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.filePath" value="/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/NAND.c"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.symbolName" value="$C$L6"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.addressBitSize" value="32"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
+<attrib name="message" value="NAND.c, line 63 ($C$L6)  [H/W BP]"/>
+<attrib name="org.eclipse.debug.core.id" value="com.ti.ccstudio.debug.debugModel"/>
+<attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/NAND.c"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.iconMask" value="7"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.addressPage" value="0"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.timeStamp" value="1610127303579"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.hardware" value="true"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.dsFilePath" value="/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/Debug/../NAND.c"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.address" value="0x00001CFE"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.lineNumber" value="63"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.type" value="2"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.serialData" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot; ?&gt;&#x0A;&lt;breakpoints xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;breakpoints.xsd&quot;&gt;&#x0A;&#x0A;  &lt;breakpoint type=&quot;Software&quot;&gt;&#x0A;    &lt;property&gt;&#x0A;      &lt;name&gt;Hardware Configuration&lt;/name&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Location&lt;/name&gt;&#x0A;        &lt;location&gt;&#x0A;          &lt;source&gt;&#x0A;            &lt;symbol_file&gt;/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/Debug/NAND_CC2652RB_LAUNCHXL.out&lt;/symbol_file&gt;&#x0A;            &lt;filename&gt;/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/Debug/../NAND.c&lt;/filename&gt;&#x0A;            &lt;line&gt;63&lt;/line&gt;&#x0A;          &lt;/source&gt;&#x0A;          &lt;page&gt;0&lt;/page&gt;&#x0A;        &lt;/location&gt;&#x0A;      &lt;/property&gt;&#x0A;    &lt;/property&gt;&#x0A;    &lt;property&gt;&#x0A;      &lt;name&gt;Debugger Response&lt;/name&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Condition&lt;/name&gt;&#x0A;        &lt;string&gt;&lt;/string&gt;&#x0A;      &lt;/property&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Skip Count&lt;/name&gt;&#x0A;        &lt;integer&gt;0&lt;/integer&gt;&#x0A;        &lt;property&gt;&#x0A;          &lt;name&gt;Current Count&lt;/name&gt;&#x0A;          &lt;integer&gt;0&lt;/integer&gt;&#x0A;        &lt;/property&gt;&#x0A;      &lt;/property&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Action&lt;/name&gt;&#x0A;        &lt;string&gt;Remain Halted&lt;/string&gt;&#x0A;      &lt;/property&gt;&#x0A;    &lt;/property&gt;&#x0A;    &lt;property&gt;&#x0A;      &lt;name&gt;Miscellaneous&lt;/name&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Group&lt;/name&gt;&#x0A;        &lt;string&gt;Default Group&lt;/string&gt;&#x0A;      &lt;/property&gt;&#x0A;      &lt;property&gt;&#x0A;        &lt;name&gt;Name&lt;/name&gt;&#x0A;        &lt;string&gt;Breakpoint&lt;/string&gt;&#x0A;      &lt;/property&gt;&#x0A;    &lt;/property&gt;&#x0A;    &lt;enabled&gt;1&lt;/enabled&gt;&#x0A;  &lt;/breakpoint&gt;&#x0A;&#x0A;&lt;/breakpoints&gt;&#x0A;"/>
+<attrib name="location" value="/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/NAND.c"/>
+<attrib name="org.eclipse.cdt.debug.ui.cDebug.capable_of_show_full_paths" value="true"/>
+<attrib name="com.ti.ccstudio.debug.CCSBreakpointMarker.hwType" value="1"/>
+<attrib name="workingset_name" value=""/>
+<attrib name="workingset_id" value="org.eclipse.debug.ui.breakpointWorkingSet"/>
+</marker>
+</breakpoint>
+</breakpoints>

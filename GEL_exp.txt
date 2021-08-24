@@ -1,0 +1,1 @@
+GEL_MemorySave(readBuf, 0, 512, "/Users/matt/ti/workspaces/ESLO_dev/NAND_CC2652RB_LAUNCHXL/memory.dat", 2, 1, 32, 1);
