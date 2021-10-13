@@ -41,6 +41,8 @@
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compilerID.LITTLE_ENDIAN.1805223209" name="Little endian code [See 'General' page to edit] (--little_endian, -me)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compilerID.LITTLE_ENDIAN" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compilerID.INCLUDE_PATH.313536222" name="Add dir to #include search path (--include_path, -I)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_20.2.compilerID.INCLUDE_PATH" valueType="includePath">
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/NAND}"/>
+									<listOptionValue builtIn="false" value="/Users/matt/Documents/Software/ESLO-Libraries/LSM6DSOX"/>
+									<listOptionValue builtIn="false" value="/Users/matt/Documents/Software/ESLO-Libraries/ADS129X"/>
 									<listOptionValue builtIn="false" value="${CMSIS_ROOT}/DSP/Include"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/FFT}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/ESLO}"/>
