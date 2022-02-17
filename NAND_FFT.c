@@ -1,3 +1,4 @@
+// https://gaidi.ca/weblog/implementing-a-biquad-cascade-iir-filter-on-a-cortex-m4?rq=CMSIS
 /* For sleep() */
 #include <unistd.h>
 //#include <stdint.h>
@@ -14,11 +15,12 @@
 #define FFT_SAMPLES_QUARTER (FFT_SAMPLES / 4) // for filter
 #define BLOCK_SIZE 32;
 
-#include "FFTsignal.h"
+//#include "FFTsignal.h"
+#include "R0003_00231.h"
 static float32_t complexFFT[FFT_SAMPLES];
-//static float32_t realFFT[FFT_SAMPLES_HALF];
-//static float32_t imagFFT[FFT_SAMPLES_HALF];
-//static float32_t angleFFT[FFT_SAMPLES_HALF];
+static float32_t realFFT[FFT_SAMPLES_HALF];
+static float32_t imagFFT[FFT_SAMPLES_HALF];
+static float32_t angleFFT[FFT_SAMPLES_HALF];
 static float32_t powerFFT[FFT_SAMPLES_HALF];
 static float32_t filtSignal[FFT_SAMPLES];
 
@@ -41,7 +43,6 @@ arm_rfft_fast_instance_f32 S;
 uint32_t maxIndex = 0;
 
 /* Driver Header files */
-#include <SPI_NAND.h>
 #include <ESLO.h>
 #include <Serialize.h>
 
@@ -53,17 +54,6 @@ uint32_t maxIndex = 0;
 /* Driver configuration */
 #include <ti_drivers_config.h>
 
-// NAND user defined
-uint8_t ret;
-uint16_t devId;
-
-uint32_t packet = 0xFF123456;
-eslo_dt eslo = { .mode = Mode_Debug, .type = Type_EEG1 };
-
-uAddrType iPage = 0;
-#define UDADDR(Address) ((uAddrType) (Address << 13))
-#define UDBLOCKADDR(Address) ((uAddrType) (Address << 13))
-uAddrType temp;
 
 uint8_t writeBuf[PAGE_DATA_SIZE]; // 2048, do not read spare?
 uint8_t readBuf[PAGE_SIZE]; // 2176, always allocate full page size
@@ -71,7 +61,6 @@ uint32_t i, iErr;
 
 void* mainThread(void *arg0) {
 	/* Call driver init functions */
-	uint32_t time;
 	float32_t phase;
 
 	GPIO_init();
@@ -80,8 +69,6 @@ void* mainThread(void *arg0) {
 	GPIO_write(_SHDN, GPIO_CFG_OUT_LOW); // ADS129X off
 	GPIO_write(LED_0, CONFIG_GPIO_LED_ON);
 
-	NAND_Init(CONFIG_SPI, _NAND_CS, _FRAM_CS);
-	ret = FlashReadDeviceIdentification(&devId);
 
 	/* FFT START */
 	arm_status status;
@@ -91,28 +78,36 @@ void* mainThread(void *arg0) {
 	while (1) {
 		GPIO_toggle(LED_0);
 
-//		time = Clock_getTicks();
+//		uint32_t time = Clock_getTicks();
 		// FILTER
-		arm_biquad_cascade_df2T_f32(&filtInst, inputSignal, filtSignal,
-		FFT_SAMPLES_QUARTER);
+//		arm_biquad_cascade_df2T_f32(&filtInst, inputSignal, filtSignal,
+//		FFT_SAMPLES_QUARTER);
 
 		status = ARM_MATH_SUCCESS;
 		status = arm_rfft_fast_init_f32(&S, fftSize);
 		/* Process the data through the CFFT/CIFFT module */
-		arm_rfft_fast_f32(&S, filtSignal, complexFFT, ifftFlag);
+//		arm_rfft_fast_f32(&S, filtSignal, complexFFT, ifftFlag);
+
+		float32_t meanInput;
+		arm_mean_f32(inputSignal, 512, &meanInput);
+		for (i = 0; i < 512; i++) {
+			inputSignal[i] = inputSignal[i] - meanInput;
+		}
+
+		arm_rfft_fast_f32(&S, inputSignal, complexFFT, ifftFlag);
 
 		// first entry is all real DC offset
 		DCoffset = complexFFT[0];
 
 //		//de-interleave
-//		for (i = 0; i < FFT_SAMPLES_HALF; i++) {
-//			realFFT[i] = complexFFT[i * 2];
-//			imagFFT[i] = complexFFT[(i * 2) + 1];
-//		}
-//
-//		for (i = 0; i < FFT_SAMPLES_HALF; i++) {
-//			angleFFT[i] = atan2f(imagFFT[i], realFFT[i]);
-//		}
+		for (i = 0; i < FFT_SAMPLES_HALF; i++) {
+			realFFT[i] = complexFFT[i * 2];
+			imagFFT[i] = complexFFT[(i * 2) + 1];
+		}
+
+		for (i = 0; i < FFT_SAMPLES_HALF; i++) {
+			angleFFT[i] = atan2f(imagFFT[i], realFFT[i]);
+		}
 
 		arm_cmplx_mag_squared_f32(complexFFT, powerFFT, FFT_SAMPLES_HALF);
 
@@ -121,30 +116,6 @@ void* mainThread(void *arg0) {
 		// correct index
 		maxIndex += 1;
 		phase = atan2f(complexFFT[(maxIndex * 2) + 1], complexFFT[maxIndex * 2]); // imag,real
-
-		/*
-		 for (i = 0; i < sizeof(writeBuf); i++) {
-		 writeBuf[i] = rand();
-		 }
-
-		 // block erase either needs to be 'graceful'
-		 // or all blocks needs to be erased on startup?
-		 // minimum delete-data size = 64 pages!
-		 ret = FlashBlockErase(UDADDR(iPage));
-		 for (iPage = 0; iPage < 10; iPage++) {
-		 ret = FlashPageProgram(UDADDR(iPage), writeBuf, sizeof(writeBuf));
-		 }
-
-		 iErr = 0;
-		 for (iPage = 0; iPage < 10; iPage++) {
-		 ret = FlashPageRead(UDADDR(iPage), readBuf);
-		 for (i = 0; i < sizeof(writeBuf); i++) {
-		 if (memcmp(&writeBuf[i],&readBuf[i],1) != 0) {
-		 iErr++;
-		 }
-		 }
-		 }
-		 */
 
 		sleep(1);
 	}
