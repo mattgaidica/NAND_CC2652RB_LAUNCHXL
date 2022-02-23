@@ -16,15 +16,18 @@
 // swaBuffer:
 //#include "R0003_00231.h" // perfect SWA
 //#include "R0003_00359.h" // crappy SWA
-//#include "R0003_00362.h" // good detection
-#include "R0003_00363.h" // 2.72Hz
+#include "R0003_00362.h" // good detection
+//#include "R0003_00363.h" // 2.72Hz
 //#include "R0003_00220.h" // non-SWA
 //#include "R0003_00659.h" // LF test
 
 static float32_t complexFFT[FFT_LEN], realFFT[FFT_HALF_LEN],
 		imagFFT[FFT_HALF_LEN], angleFFT[FFT_HALF_LEN], powerFFT[FFT_HALF_LEN];
 float32_t swaFFT[FFT_LEN] = { 0 };
+
 float32_t filtInput[SWA_LEN], filtOutput[SWA_LEN];
+float32_t *InputValuesf32_ptr = &filtInput[0];  // declare Input pointer
+float32_t *OutputValuesf32_ptr = &filtOutput[0]; // declare Output pointer
 
 uint32_t fftSize = FFT_LEN;
 uint32_t ifftFlag = 0;
@@ -32,30 +35,24 @@ arm_rfft_fast_instance_f32 S;
 uint32_t maxIndex = 0;
 arm_status armStatus;
 float32_t maxValue;
-uint16_t iArm;
 uint32_t timeElapsed, iStep;
 
 float32_t Fs, stepSize, Fc; // moved these
 
 // Filter
-#define IIR_ORDER 16
-#define IIR_NUMSTAGES (IIR_ORDER/2)
-static float32_t m_biquad_state[IIR_ORDER];
-static float32_t m_biquad_coeffs[5 * IIR_NUMSTAGES] = { 0.8438558985f,
-		-1.6351879750f, 0.8438558985f, 1.9287731453f, -0.9654257558f,
-		0.8438558985f, -1.6873686793f, 0.8438558985f, 1.9945479756f,
-		-0.9952291527f, 0.7188136140f, -1.3634894168f, 0.7188136140f,
-		1.8997354675f, -0.9259286369f, 0.7188136140f, -1.4374526701f,
-		0.7188136140f, 1.9848343985f, -0.9857663068f, 0.4658449997f,
-		-0.6668070904f, 0.4658449997f, 1.9531940082f, -0.9553548338f,
-		0.4658449997f, -0.9316719297f, 0.4658449997f, 1.8897069251f,
-		-0.9007244148f, 0.1138709021f, -0.2216813213f, 0.1138709021f,
-		1.9493721928f, -0.9905892999f, 0.1138709021f, -0.2276875334f,
-		0.1138709021f, 1.9982291468f, -0.9988431274f };
-arm_biquad_cascade_df2T_instance_f32 const filtInst = {
-IIR_ORDER / 2, m_biquad_state, m_biquad_coeffs };
+#define NUM_SECTIONS_IIR 2
 
-#define BLOCK_SIZE	32
+// IIR Coefficients
+float32_t iirCoeffsf32[NUM_SECTIONS_IIR * 5] = { // b0, b1, b2, a1, a2
+		0.05871944653317, 0.11743889306635, 0.05871944653317, 1.23859224269646,
+				-0.47527907203419, 0.96505525434840, -1.93011050869680,
+				0.96505525434840, 1.94430253415389, -0.94604808142077 };
+
+#define BLOCKSIZE 32
+#define NUMBLOCKS  (SWA_LEN/BLOCKSIZE)
+float32_t iirStatesf32[NUM_SECTIONS_IIR * 2];
+
+arm_biquad_cascade_df2T_instance_f32 Sf;
 
 /* Driver Header files */
 
@@ -74,37 +71,55 @@ void* mainThread(void *arg0) {
 
 		timeElapsed = Clock_getTicks();
 
-		uint32_t blockSize = BLOCK_SIZE;
-		uint32_t numBlocks = SWA_LEN / BLOCK_SIZE;
-		uint32_t i;
+		uint32_t k;
 		uint32_t swaDiv = 2;
 
 		// convert to float for CMSIS functions
-		for (iArm = 0; iArm < SWA_LEN; iArm++) {
-			filtInput[iArm] = (float32_t) swaBuffer[iArm];
+		float32_t filtSum = 0;
+		for (k = 0; k < SWA_LEN; k++) {
+//			filtInput[k] = (float32_t) swaBuffer[k];
+			filtInput[k] = ESLO_ADSgain_uV(swaBuffer[k]);
+			filtSum += filtInput[k];
 		}
-		// !! what is the added delay for more precision?
-		// !! NEED TO GET FILTER RIGHT FIRST, not sure I need block loop
+		// remove DC component
+		float32_t mean_uV = filtSum / SWA_LEN;
+		for (k = 0; k < SWA_LEN; k++) {
+			filtInput[k] = filtInput[k] - mean_uV;
+		}
+
+		// Initialise Biquads
+		arm_biquad_cascade_df2T_init_f32(&Sf, NUM_SECTIONS_IIR,
+				&(iirCoeffsf32[0]), &(iirStatesf32[0]));
+
+		// Perform IIR filtering operation
+		for (k = 0; k < NUMBLOCKS; k++)
+			arm_biquad_cascade_df2T_f32(&Sf,
+					InputValuesf32_ptr + (k * BLOCKSIZE),
+					OutputValuesf32_ptr + (k * BLOCKSIZE), BLOCKSIZE); // perform filtering
+
+		// find max uV of filtered signal
+		float32_t max_uV = 0;
+		for (k = 0; k < SWA_LEN; k++) {
+			if (fabs(filtOutput[k]) > max_uV) {
+				max_uV = fabs(filtOutput[k]);
+			}
+		}
+		// IF MAX > THRESH CONTINUE
+
+		// only init once
 		armStatus = ARM_MATH_SUCCESS;
 		armStatus = arm_rfft_fast_init_f32(&S, fftSize);
-
-		for (i = 0; i < numBlocks; i++) {
-//			arm_fir_f32(&S, inputF32 + (i * blockSize),
-//					outputF32 + (i * blockSize), blockSize);
-			arm_biquad_cascade_df2T_f32(&filtInst, filtInput + (i * blockSize),
-					filtOutput + (i * blockSize), blockSize);
-		}
 
 		// subsample to reduce Fs and make FFT more accurate for SWA freqs
 		for (swaDiv = 2; swaDiv > 0; swaDiv--) {
 			memset(swaFFT, 0x00, sizeof(float32_t) * FFT_LEN); // swaFFT is manipulated in place, always reset to zero
 			if (swaDiv == 2) {
-				for (iArm = 0; iArm < SWA_LEN / swaDiv; iArm++) {
-					swaFFT[iArm] = filtOutput[iArm * swaDiv]; // subsample
+				for (k = 0; k < SWA_LEN / swaDiv; k++) {
+					swaFFT[k] = filtOutput[k * swaDiv]; // subsample
 				}
 			} else {
-				for (iArm = 0; iArm < SWA_LEN / 2; iArm++) {
-					swaFFT[iArm] = filtOutput[iArm + (SWA_LEN / 2)]; // memcpy from tail
+				for (k = 0; k < SWA_LEN / 2; k++) {
+					swaFFT[k] = filtOutput[k + (SWA_LEN / 2)]; // memcpy from tail
 				}
 			}
 
@@ -131,39 +146,51 @@ void* mainThread(void *arg0) {
 //			} // retry swaDiv=1
 		}
 
-		// !! if there is any phase distortion, need to FFT on original (float_32t) swaBuffer data to get phase at Fc
-
-		// SWA_FFT_THRESH == 0 skips all filters for baseline recordings
 		float32_t SWA_mean = 0;
-		float32_t nSWA_mean = 0;
+		float32_t THETA_mean = 0;
 		uint16_t SWA_count = 0;
-		uint16_t nSWA_count = 0;
+		uint16_t THETA_count = 0;
 		for (iStep = 0; iStep < FFT_HALF_LEN; iStep++) {
-			if (stepSize * iStep > SWA_F_MIN && stepSize * iStep <= SWA_F_MAX) {
+			if (stepSize * iStep >= SWA_F_MIN && stepSize * iStep < SWA_F_MAX) {
 				SWA_mean = SWA_mean + powerFFT[iStep];
 				SWA_count++;
-			} else {
-				nSWA_mean = nSWA_mean + powerFFT[iStep];
-				nSWA_count++;
+			}
+			if (stepSize * iStep >= THETA_F_MIN
+					&& stepSize * iStep < THETA_F_MAX) {
+				THETA_mean = THETA_mean + powerFFT[iStep];
+				THETA_count++;
 			}
 		}
 		SWA_mean = SWA_mean / (float32_t) SWA_count;
-		nSWA_mean = nSWA_mean / (float32_t) nSWA_count;
-		float swaRatio = SWA_mean / nSWA_mean;
+		THETA_mean = THETA_mean / (float32_t) THETA_count;
+		float32_t swaRatio = SWA_mean / THETA_mean;
+
+		// redo FFT on raw data to get true phase
+		memset(swaFFT, 0x00, sizeof(float32_t) * FFT_LEN);
+		swaDiv++; // adjust swaDiv from loop
+		if (swaDiv == 2) {
+			for (k = 0; k < SWA_LEN / swaDiv; k++) {
+				swaFFT[k] = (float32_t) swaBuffer[k * swaDiv]; // subsample
+			}
+		} else {
+			for (k = 0; k < SWA_LEN / 2; k++) {
+				swaFFT[k] = (float32_t) swaBuffer[k + (SWA_LEN / 2)]; // memcpy from tail
+			}
+		}
+		arm_rfft_fast_f32(&S, swaFFT, complexFFT, ifftFlag);
 
 		// de-interleave real and complex values, used in atan() for phase
-		for (iArm = 0; iArm <= (FFT_LEN / 2) - 1; iArm++) {
-			realFFT[iArm] = complexFFT[iArm * 2];
-			imagFFT[iArm] = complexFFT[(iArm * 2) + 1];
+		for (k = 0; k <= (FFT_LEN / 2) - 1; k++) {
+			realFFT[k] = complexFFT[k * 2];
+			imagFFT[k] = complexFFT[(k * 2) + 1];
 		}
 		// find angle of FFT
-		for (iArm = 0; iArm <= FFT_LEN / 2; iArm++) {
-			angleFFT[iArm] = atan2f(imagFFT[iArm], realFFT[iArm]);
+		for (k = 0; k <= FFT_LEN / 2; k++) {
+			angleFFT[k] = atan2f(imagFFT[k], realFFT[k]);
 		}
 
 		float32_t degSec = 360 * Fc;
-		float32_t windowLength = (float32_t) SWA_LEN
-				/ (EEG_FS / (float32_t) EEG_SAMPLING_DIV);
+		float32_t windowLength = SWA_LEN / Fs;
 		timeElapsed = (Clock_getTicks() - timeElapsed) * Clock_tickPeriod;
 		float32_t computeDegrees = degSec * (float32_t) timeElapsed / 1000000;
 		float32_t endAngle = degSec * windowLength
