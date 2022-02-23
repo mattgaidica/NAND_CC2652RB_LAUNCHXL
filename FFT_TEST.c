@@ -16,8 +16,8 @@
 // swaBuffer:
 //#include "R0003_00231.h" // perfect SWA
 //#include "R0003_00359.h" // crappy SWA
-#include "R0003_00362.h" // good detection
-//#include "R0003_00363.h" // 2.72Hz
+//#include "R0003_00362.h" // good detection
+#include "R0003_00363.h" // 2.72Hz
 //#include "R0003_00220.h" // non-SWA
 //#include "R0003_00659.h" // LF test
 
@@ -62,6 +62,14 @@ arm_biquad_cascade_df2T_instance_f32 Sf;
 /* Driver configuration */
 #include <ti_drivers_config.h>
 
+static float32_t ESLO_ADSgain_uV(int32_t rawValue) {
+	float32_t rawFloat = (float32_t) rawValue;
+	float32_t refV = (VREF / ADS_GAIN) / 8388607;
+	float32_t empiricMult = 1.6667;
+	float32_t uV = rawFloat * (refV) * 1000000 * empiricMult; // 5/3 is empiric, see MATLAB
+	return uV;
+}
+
 void* mainThread(void *arg0) {
 	GPIO_init();
 	GPIO_write(LED_0, CONFIG_GPIO_LED_ON);
@@ -70,14 +78,13 @@ void* mainThread(void *arg0) {
 		GPIO_toggle(LED_0);
 
 		timeElapsed = Clock_getTicks();
-
-		uint32_t k;
+		uint32_t k, iStep;
 		uint32_t swaDiv = 2;
 
 		// convert to float for CMSIS functions
 		float32_t filtSum = 0;
 		for (k = 0; k < SWA_LEN; k++) {
-//			filtInput[k] = (float32_t) swaBuffer[k];
+			//			filtInput[k] = (float32_t) swaBuffer[k];
 			filtInput[k] = ESLO_ADSgain_uV(swaBuffer[k]);
 			filtSum += filtInput[k];
 		}
@@ -95,7 +102,8 @@ void* mainThread(void *arg0) {
 		for (k = 0; k < NUMBLOCKS; k++)
 			arm_biquad_cascade_df2T_f32(&Sf,
 					InputValuesf32_ptr + (k * BLOCKSIZE),
-					OutputValuesf32_ptr + (k * BLOCKSIZE), BLOCKSIZE); // perform filtering
+					OutputValuesf32_ptr + (k * BLOCKSIZE),
+					BLOCKSIZE); // perform filtering
 
 		// find max uV of filtered signal
 		float32_t max_uV = 0;
@@ -104,14 +112,17 @@ void* mainThread(void *arg0) {
 				max_uV = fabs(filtOutput[k]);
 			}
 		}
-		// IF MAX > THRESH CONTINUE
+
+		// is the filtered max amplitude above user thresh?
+//		if (max_uV < (float32_t) esloSettings[Set_SWAThresh]) {
+//			return;
+//		}
 
 		// only init once
-		armStatus = ARM_MATH_SUCCESS;
-		armStatus = arm_rfft_fast_init_f32(&S, fftSize);
+		arm_rfft_fast_init_f32(&S, fftSize);
 
 		// subsample to reduce Fs and make FFT more accurate for SWA freqs
-		for (swaDiv = 2; swaDiv > 0; swaDiv--) {
+		while (1) {
 			memset(swaFFT, 0x00, sizeof(float32_t) * FFT_LEN); // swaFFT is manipulated in place, always reset to zero
 			if (swaDiv == 2) {
 				for (k = 0; k < SWA_LEN / swaDiv; k++) {
@@ -123,9 +134,6 @@ void* mainThread(void *arg0) {
 				}
 			}
 
-//			if (armStatus != ARM_MATH_SUCCESS) {
-//				return NULL; // !! return?
-//			}
 			// input is real, output is interleaved real and complex
 			arm_rfft_fast_f32(&S, swaFFT, complexFFT, ifftFlag);
 
@@ -139,11 +147,12 @@ void* mainThread(void *arg0) {
 			Fc = stepSize * maxIndex;
 
 			if (Fc < SWA_F_MIN || Fc >= SWA_F_MAX) { // do ratio here?
-				return NULL; // !! return?
+//				return;
 			}
-//			if (Fc < 2) { // !! hardcode this?
-//				break;
-//			} // retry swaDiv=1
+			if (Fc < 2 || swaDiv == 1) {
+				break;
+			} // retry swaDiv=1
+			swaDiv--;
 		}
 
 		float32_t SWA_mean = 0;
@@ -165,9 +174,13 @@ void* mainThread(void *arg0) {
 		THETA_mean = THETA_mean / (float32_t) THETA_count;
 		float32_t swaRatio = SWA_mean / THETA_mean;
 
+		// is the SWA/THETA ratio above user thresh?
+//		if (swaRatio < (float32_t) esloSettings[Set_SWARatio]) {
+//			return;
+//		}
+
 		// redo FFT on raw data to get true phase
 		memset(swaFFT, 0x00, sizeof(float32_t) * FFT_LEN);
-		swaDiv++; // adjust swaDiv from loop
 		if (swaDiv == 2) {
 			for (k = 0; k < SWA_LEN / swaDiv; k++) {
 				swaFFT[k] = (float32_t) swaBuffer[k * swaDiv]; // subsample
@@ -190,13 +203,13 @@ void* mainThread(void *arg0) {
 		}
 
 		float32_t degSec = 360 * Fc;
-		float32_t windowLength = SWA_LEN / Fs;
+		float32_t windowLength = SWA_LEN / (Fs * EEG_SAMPLING_DIV);
 		timeElapsed = (Clock_getTicks() - timeElapsed) * Clock_tickPeriod;
 		float32_t computeDegrees = degSec * (float32_t) timeElapsed / 1000000;
 		float32_t endAngle = degSec * windowLength
 				+ (angleFFT[maxIndex] * 180 / M_PI) + computeDegrees;
 
-		int32_t phaseAngle = (int32_t) (1000 * endAngle) % (360 * 1000);
+		int32_t phaseA ngle = (int32_t) (1000 * endAngle) % (360 * 1000);
 		int32_t dominantFreq = (int32_t) (Fc * 1000);
 
 		sleep(1);
