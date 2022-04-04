@@ -209,7 +209,7 @@ void* mainThread(void *arg0) {
 		float32_t endAngle = degSec * windowLength
 				+ (angleFFT[maxIndex] * 180 / M_PI) + computeDegrees;
 
-		int32_t phaseA ngle = (int32_t) (1000 * endAngle) % (360 * 1000);
+		int32_t phaseAngle = (int32_t) (1000 * endAngle) % (360 * 1000);
 		int32_t dominantFreq = (int32_t) (Fc * 1000);
 
 		sleep(1);
